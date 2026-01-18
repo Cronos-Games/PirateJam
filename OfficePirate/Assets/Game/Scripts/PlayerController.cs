@@ -14,9 +14,14 @@ public class PlayerController : MonoBehaviour
     private Vector3 _deltaPos;
     private Quaternion _deltaRot = Quaternion.identity;
 
-    [Header("Turn Tuning")]
+    [Header("Settings")]
     [SerializeField] private float inputDeadzone = 0.15f;     // stick deadzone
     [SerializeField] private float rotationDeadzone = 2f;      // degrees
+    [SerializeField] private float rotationSpeedMultiplier = 1.5f;
+    
+    [Header("References")]
+    [SerializeField] private Animation turnLeftAnim;
+    [SerializeField] private Animation turnRightAnim;
 
     private bool _hasTargetYaw;
     private float _targetYaw; // degrees in world Y
