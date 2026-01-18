@@ -61,6 +61,7 @@ public class ProcessController : MonoBehaviour
     /// Call this when the player interacts with the process.
     /// For now it's public so you can trigger it from anywhere.
     /// </summary>
+    [Button(ButtonSizes.Medium)]
     public void Interact()
     {
         if (isDisabled) return;
@@ -118,16 +119,4 @@ public class ProcessController : MonoBehaviour
         disabledTimeRemaining = 0f;
         disableRoutine = null;
     }
-    
-#if UNITY_EDITOR
-    private bool IsPlaying => UnityEngine.Application.isPlaying;
-
-    [FoldoutGroup("Editor Debug")]
-    [Button(ButtonSizes.Medium)]
-    [EnableIf("@IsPlaying")]
-    private void InteractEditor()
-    {
-        Interact();
-    }
-#endif
 }
