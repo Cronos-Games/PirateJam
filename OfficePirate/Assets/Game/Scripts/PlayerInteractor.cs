@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using Sirenix.OdinInspector;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -8,7 +10,7 @@ public class PlayerInteractor : MonoBehaviour
 {
     [Header("Input System")]
     [Tooltip("Reference to an InputAction (Button) like 'Interact' bound to E.")]
-    [SerializeField] [Required] private InputActionReference interactAction;
+    [SerializeField] private InputActionReference interactAction;
 
     [Header("Selection")]
     [Tooltip("Max number of candidates to consider (safety).")]
@@ -48,7 +50,8 @@ public class PlayerInteractor : MonoBehaviour
     {
         if (currentTarget == null) return;
         if (!currentTarget.CanInteract) return;
-
+        Debug.Log(currentTarget);
+        Debug.Log(nearby.Count);
         currentTarget.Interact();
         onInteractPerformed?.Invoke();
     }
@@ -78,6 +81,8 @@ public class PlayerInteractor : MonoBehaviour
                 bestPriority = p;
                 bestDistSq = d;
             }
+            Debug.Log(currentTarget);
+            
         }
 
         if (best != currentTarget)
@@ -94,7 +99,10 @@ public class PlayerInteractor : MonoBehaviour
         // Grab any IInteractable on this object or its parents
         var mono = other.GetComponentInParent<MonoBehaviour>();
         if (mono is IInteractable interactable)
+        {
             nearby.Add(interactable);
+            Debug.Log(nearby.First());           
+        }
     }
 
     private void OnTriggerExit(Collider other)
