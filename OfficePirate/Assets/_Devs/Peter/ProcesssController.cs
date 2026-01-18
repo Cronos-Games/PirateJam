@@ -2,18 +2,18 @@ using System.Collections;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-public class ProcessController : MonoBehaviour
+public class ProcessController : MonoBehaviour, IInteractable
 {
     [Header("Progress")]
-    [Tooltip("How many progress points this process adds each second.")]
-    [SerializeField] private int progressPerSecond = 5;
+    [SerializeField] [Required] private int progressPerSecond;
 
     [Header("Disable Minigame")]
-    [Tooltip("Prefab that spawns UI/minigame. Must have MiniGameController on the root.")]
-    [SerializeField] private MiniGameController miniGamePrefab;
+    [SerializeField] [Required]  private MiniGameController miniGamePrefab;
+    [SerializeField] [Required]  private float disableDuration;
 
-    [Tooltip("How long this process stops producing progress after successful minigame.")]
-    [SerializeField] private float disableDuration = 5f;
+    [Header("Interaction")]
+    [Tooltip("When multiple interactables are in range, higher priority wins.")]
+    [SerializeField] private int priority = 0;
 
     [Header("State (Read Only)")]
     [SerializeField] private bool isDisabled;
@@ -21,13 +21,15 @@ public class ProcessController : MonoBehaviour
 
     private Coroutine disableRoutine;
     private GameObject activeMiniGameInstance;
-
-    // Accumulates time until we can apply whole-second ticks.
     private float tickAccumulator;
+
+    // --- IInteractable ---
+    public Transform Transform => transform;
+    public bool CanInteract => !isDisabled && activeMiniGameInstance == null && miniGamePrefab != null;
+    public int Priority => priority;
 
     private void Update()
     {
-        // Inspector-friendly countdown (optional)
         if (isDisabled && disabledTimeRemaining > 0f)
             disabledTimeRemaining -= Time.deltaTime;
 
@@ -36,41 +38,29 @@ public class ProcessController : MonoBehaviour
 
     private void TickProgress()
     {
-        // If we're not actively producing, don't accumulate time.
         if (isDisabled || ProgressManager.Instance == null || progressPerSecond <= 0)
         {
             tickAccumulator = 0f;
             return;
         }
 
-        // Add the frame time; on a hitch, this could jump by e.g. 0.2s or 2.0s.
         tickAccumulator += Time.deltaTime;
 
-        // How many full 1-second ticks have elapsed?
-        int ticks = (int)tickAccumulator; // same as FloorToInt for non-negative
+        int ticks = (int)tickAccumulator;
         if (ticks <= 0) return;
 
-        // Remove the processed seconds, keep remainder (0.. <1 sec)
         tickAccumulator -= ticks;
-
-        // Apply discrete integer progress
         ProgressManager.Instance.AddProgress(progressPerSecond * ticks);
     }
 
-    /// <summary>
-    /// Call this when the player interacts with the process.
-    /// For now it's public so you can trigger it from anywhere.
-    /// </summary>
-    [Button(ButtonSizes.Medium)]
     public void Interact()
     {
-        if (isDisabled) return;
-        if (activeMiniGameInstance != null) return;
-        if (miniGamePrefab == null) return;
+        if (!CanInteract) return;
 
         activeMiniGameInstance = Instantiate(miniGamePrefab.gameObject);
 
         var mini = activeMiniGameInstance.GetComponent<MiniGameController>();
+        reminding:
         if (mini == null)
         {
             Debug.LogError("MiniGame prefab must have MiniGameController on the root.");
@@ -83,7 +73,6 @@ public class ProcessController : MonoBehaviour
             successCallback: OnMiniGameSuccess,
             cancelCallback: OnMiniGameCancelled
         );
-
     }
 
     private void OnMiniGameSuccess()
@@ -109,8 +98,6 @@ public class ProcessController : MonoBehaviour
     {
         isDisabled = true;
         disabledTimeRemaining = seconds;
-
-        // Important: no banking time while disabled
         tickAccumulator = 0f;
 
         yield return new WaitForSeconds(seconds);
@@ -119,4 +106,13 @@ public class ProcessController : MonoBehaviour
         disabledTimeRemaining = 0f;
         disableRoutine = null;
     }
+
+#if UNITY_EDITOR
+    private bool IsPlaying => UnityEngine.Application.isPlaying;
+
+    [FoldoutGroup("Editor Debug")]
+    [Button(ButtonSizes.Medium)]
+    [EnableIf("@IsPlaying")]
+    private void InteractEditor() => Interact();
+#endif
 }
