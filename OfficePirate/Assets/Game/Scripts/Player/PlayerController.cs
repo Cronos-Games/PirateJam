@@ -17,7 +17,6 @@ public class PlayerController : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private float inputDeadzone = 0.15f;     // stick deadzone
     [SerializeField] private float rotationDeadzone = 2f;      // degrees
-    [SerializeField] private float rotationSpeedMultiplier = 1.5f;
     
     [Header("References")]
     [SerializeField] private Animation turnLeftAnim;
