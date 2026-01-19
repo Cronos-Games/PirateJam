@@ -50,8 +50,6 @@ public class PlayerInteractor : MonoBehaviour
     {
         if (currentTarget == null) return;
         if (!currentTarget.CanInteract) return;
-        Debug.Log(currentTarget);
-        Debug.Log(nearby.Count);
         currentTarget.Interact();
         onInteractPerformed?.Invoke();
     }
@@ -81,7 +79,6 @@ public class PlayerInteractor : MonoBehaviour
                 bestPriority = p;
                 bestDistSq = d;
             }
-            Debug.Log(currentTarget);
             
         }
 

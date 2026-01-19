@@ -77,12 +77,17 @@ public class ProcessController : MonoBehaviour, IInteractable
 
     private void OnMiniGameSuccess()
     {
+        Debug.Log("MiniGame Success");
+        Destroy(activeMiniGameInstance);
         activeMiniGameInstance = null;
         DisableForSeconds(disableDuration);
     }
 
     private void OnMiniGameCancelled()
     {
+        Debug.Log("MiniGame cancelled");
+        
+        Destroy(activeMiniGameInstance);
         activeMiniGameInstance = null;
     }
 
