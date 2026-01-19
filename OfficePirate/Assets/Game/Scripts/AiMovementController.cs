@@ -59,8 +59,6 @@ public class AiMovementController : MonoBehaviour
     {
         Vector2 direction = new Vector2(_agent.velocity.x, _agent.velocity.z); 
         _moveInput = direction;
-        
-        Debug.Log(_moveInput);
     }
     
 
