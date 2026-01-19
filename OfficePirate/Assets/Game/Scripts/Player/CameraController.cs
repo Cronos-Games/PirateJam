@@ -18,8 +18,5 @@ public class CameraController : MonoBehaviour
     void Update()
     {
         transform.position = new Vector3(followTarget.transform.position.x, followTarget.transform.position.y + height, followTarget.transform.position.z + offSet);
-        Debug.Log(followTarget.transform.position.x + " " + offSet);
-        //transform.rotation = new Quaternion(transform.rotation.x + angle, transform.rotation.y, transform.rotation.z, transform.rotation.w);
-
     }
 }

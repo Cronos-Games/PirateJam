@@ -17,7 +17,7 @@ public class AiMovementController : MonoBehaviour
     private Quaternion _deltaRot = Quaternion.identity;
 
     public UnityEvent reachedWayPoint;
-    
+    private bool _isWalking;
 
     [Header("Settings")]
     [SerializeField] private float inputDeadzone = 0.15f;     // stick deadzone
@@ -31,6 +31,8 @@ public class AiMovementController : MonoBehaviour
     private bool _hasTargetYaw;
     private float _targetYaw; // degrees in world Y
 
+    
+    
     void Awake()
     {
         _rb = GetComponent<Rigidbody>();
@@ -57,9 +59,12 @@ public class AiMovementController : MonoBehaviour
 
     private void Update()
     {
-        if (_agent.remainingDistance <= stoppingDistance)
+        float distance = Vector3.Distance(_rb.position, _agent.destination);
+        if (distance <= stoppingDistance && _isWalking)
         {
             reachedWayPoint.Invoke();
+            Debug.Log("reached waypoint");
+            _isWalking = false;
         }
     }
 
@@ -192,6 +197,7 @@ public class AiMovementController : MonoBehaviour
     public void SetDestination(Transform Destination)
     {
         _agent.SetDestination(Destination.position);
+        _isWalking = true;
     }
     
     
