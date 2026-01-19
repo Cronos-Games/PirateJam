@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Events;
 
 public class AiMovementController : MonoBehaviour
 {
@@ -15,9 +16,13 @@ public class AiMovementController : MonoBehaviour
     private Vector3 _deltaPos;
     private Quaternion _deltaRot = Quaternion.identity;
 
+    public UnityEvent reachedWayPoint;
+    private bool _isWalking;
+
     [Header("Settings")]
     [SerializeField] private float inputDeadzone = 0.15f;     // stick deadzone
     [SerializeField] private float rotationDeadzone = 2f;      // degrees
+    [SerializeField] private float stoppingDistance = 1f;
 
 
     [Header("References")]
@@ -26,6 +31,8 @@ public class AiMovementController : MonoBehaviour
     private bool _hasTargetYaw;
     private float _targetYaw; // degrees in world Y
 
+    
+    
     void Awake()
     {
         _rb = GetComponent<Rigidbody>();
@@ -37,13 +44,28 @@ public class AiMovementController : MonoBehaviour
         
         _agent.updatePosition = false;
         _agent.updateRotation = false;
-        
-        _agent.destination = target.transform.position;
+
+        _agent.stoppingDistance = stoppingDistance;
+
+    }
+
+    private void Start()
+    {
+        if (reachedWayPoint == null)
+        {
+            reachedWayPoint = new UnityEvent();
+        }
     }
 
     private void Update()
     {
-
+        float distance = Vector3.Distance(_rb.position, _agent.destination);
+        if (distance <= stoppingDistance && _isWalking)
+        {
+            reachedWayPoint.Invoke();
+            Debug.Log("reached waypoint");
+            _isWalking = false;
+        }
     }
 
     void FixedUpdate()
@@ -59,8 +81,6 @@ public class AiMovementController : MonoBehaviour
     {
         Vector2 direction = new Vector2(_agent.velocity.x, _agent.velocity.z); 
         _moveInput = direction;
-        
-        Debug.Log(_moveInput);
     }
     
 
@@ -173,4 +193,12 @@ public class AiMovementController : MonoBehaviour
         _animator.SetBool("TurnRight", turnRight);
         _animator.SetBool("TurnLeft", !turnRight);
     }
+    
+    public void SetDestination(Transform Destination)
+    {
+        _agent.SetDestination(Destination.position);
+        _isWalking = true;
+    }
+    
+    
 }

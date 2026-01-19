@@ -3960,6 +3960,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4389961648432183896}
+  - component: {fileID: 9197256030849417287}
   - component: {fileID: 6246254646157407815}
   - component: {fileID: 7952261995016620559}
   - component: {fileID: 7093924883115775839}
@@ -4005,6 +4006,26 @@ Transform:
   - {fileID: 6661779728744577414}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &9197256030849417287
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8224575871189975769}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cad6e54947e74a14f9714b9669838177, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NPCAi
+  basePosition: {fileID: 0}
+  targets:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  baseUpperTimeLimit: 20
+  baseLowerTimeLimit: 10
 --- !u!114 &6246254646157407815
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4017,8 +4038,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d5c66454197b334ab619593f1c9a454, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.AiMovementController
+  reachedWayPoint:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 9197256030849417287}
+        m_TargetAssemblyTypeName: NPCAi, Assembly-CSharp
+        m_MethodName: OnReachedWaypoint
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   inputDeadzone: 0.15
   rotationDeadzone: 2
+  stoppingDistance: 1
   target: {fileID: 0}
 --- !u!95 &7952261995016620559
 Animator:
