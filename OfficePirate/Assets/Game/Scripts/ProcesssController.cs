@@ -27,6 +27,8 @@ public class ProcessController : MonoBehaviour, IInteractable
     public Transform Transform => transform;
     public bool CanInteract => !isDisabled && activeMiniGameInstance == null && miniGamePrefab != null;
     public int Priority => priority;
+    public float UpperTimeLimit { get; }
+    public float LowerTimeLimit { get; }
 
     private void Update()
     {

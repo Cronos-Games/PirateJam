@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Events;
 
 public class AiMovementController : MonoBehaviour
 {
@@ -15,9 +16,13 @@ public class AiMovementController : MonoBehaviour
     private Vector3 _deltaPos;
     private Quaternion _deltaRot = Quaternion.identity;
 
+    public UnityEvent reachedWayPoint;
+    
+
     [Header("Settings")]
     [SerializeField] private float inputDeadzone = 0.15f;     // stick deadzone
     [SerializeField] private float rotationDeadzone = 2f;      // degrees
+    [SerializeField] private float stoppingDistance = 1f;
 
 
     [Header("References")]
@@ -37,13 +42,25 @@ public class AiMovementController : MonoBehaviour
         
         _agent.updatePosition = false;
         _agent.updateRotation = false;
-        
-        _agent.destination = target.transform.position;
+
+        _agent.stoppingDistance = stoppingDistance;
+
+    }
+
+    private void Start()
+    {
+        if (reachedWayPoint == null)
+        {
+            reachedWayPoint = new UnityEvent();
+        }
     }
 
     private void Update()
     {
-
+        if (_agent.remainingDistance <= stoppingDistance)
+        {
+            reachedWayPoint.Invoke();
+        }
     }
 
     void FixedUpdate()
@@ -171,4 +188,11 @@ public class AiMovementController : MonoBehaviour
         _animator.SetBool("TurnRight", turnRight);
         _animator.SetBool("TurnLeft", !turnRight);
     }
+    
+    public void SetDestination(Transform Destination)
+    {
+        _agent.SetDestination(Destination.position);
+    }
+    
+    
 }
