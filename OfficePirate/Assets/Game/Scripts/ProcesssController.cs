@@ -32,6 +32,7 @@ public class ProcessController : MonoBehaviour, IInteractable
     private GameObject activeMiniGameInstance;
     private float tickAccumulator;
 
+    private Outline _levelOutline;
     private Outline _mapOutline;
 
     // --- IInteractable ---
@@ -42,7 +43,8 @@ public class ProcessController : MonoBehaviour, IInteractable
 
     private void Start()
     {
-            _mapOutline = mapShaderObject.GetComponent<Outline>();
+        _levelOutline = GetComponent<Outline>();
+        _mapOutline = mapShaderObject.GetComponent<Outline>();
     }
 
     private void Update()
@@ -99,6 +101,7 @@ public class ProcessController : MonoBehaviour, IInteractable
         activeMiniGameInstance = null;
         DisableForSeconds(disableDuration);
         
+        _levelOutline.enabled = false;
         _mapOutline.OutlineColor = Color.red; //set outline to red
     }
 
@@ -114,6 +117,7 @@ public class ProcessController : MonoBehaviour, IInteractable
 
     private void OnTaskReset()
     {
+        _levelOutline.enabled = true;
         _mapOutline.OutlineColor = Color.green; //set outline to green
     }
 
