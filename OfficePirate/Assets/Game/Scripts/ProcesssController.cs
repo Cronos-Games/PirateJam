@@ -140,6 +140,8 @@ public class ProcessController : MonoBehaviour, IInteractable
         isDisabled = false;
         disabledTimeRemaining = 0f;
         disableRoutine = null;
+        
+        OnTaskReset();
     }
 
 #if UNITY_EDITOR

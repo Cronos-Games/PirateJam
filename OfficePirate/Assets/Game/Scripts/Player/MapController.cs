@@ -7,6 +7,7 @@ public class MapController : MonoBehaviour
 {
     private Camera _mainCamera;
     [SerializeField] private Camera mapCamera;
+    [SerializeField] private InputActionReference playerMoveAction;
 
     private void Start()
     {
@@ -17,6 +18,20 @@ public class MapController : MonoBehaviour
     {
         _mainCamera.enabled = !_mainCamera.enabled;
         mapCamera.enabled = !mapCamera.enabled;
+        
+        TogglePlayerMove();
+    }
+
+    private void TogglePlayerMove()
+    {
+        if (_mainCamera.enabled)
+        {
+            playerMoveAction.action.Enable();
+        }
+        else
+        {
+            playerMoveAction.action.Disable();
+        }
     }
     
     
