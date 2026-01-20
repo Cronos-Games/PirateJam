@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -14,6 +15,14 @@ public class ProcessController : MonoBehaviour, IInteractable
     [Header("Interaction")]
     [Tooltip("When multiple interactables are in range, higher priority wins.")]
     [SerializeField] private int priority = 0;
+    
+    [Header("Ai")]
+    public float UpperTimeLimit;
+    public float LowerTimeLimit;
+
+    [Header("Map")] 
+    [SerializeField] private GameObject mapShaderObject;
+    
 
     [Header("State (Read Only)")]
     [SerializeField] private bool isDisabled;
@@ -23,13 +32,18 @@ public class ProcessController : MonoBehaviour, IInteractable
     private GameObject activeMiniGameInstance;
     private float tickAccumulator;
 
+    private Outline _mapOutline;
+
     // --- IInteractable ---
     public Transform Transform => transform;
     public bool CanInteract => !isDisabled && activeMiniGameInstance == null && miniGamePrefab != null;
     public int Priority => priority;
-    
-    public float UpperTimeLimit;
-    public float LowerTimeLimit;
+
+
+    private void Start()
+    {
+            _mapOutline = mapShaderObject.GetComponent<Outline>();
+    }
 
     private void Update()
     {
@@ -84,6 +98,8 @@ public class ProcessController : MonoBehaviour, IInteractable
         Destroy(activeMiniGameInstance);
         activeMiniGameInstance = null;
         DisableForSeconds(disableDuration);
+        
+        _mapOutline.OutlineColor = Color.red; //set outline to red
     }
 
     private void OnMiniGameCancelled()
@@ -92,6 +108,13 @@ public class ProcessController : MonoBehaviour, IInteractable
         
         Destroy(activeMiniGameInstance);
         activeMiniGameInstance = null;
+        
+        _mapOutline.OutlineColor = Color.yellow; //set outline to yellow
+    }
+
+    private void OnTaskReset()
+    {
+        _mapOutline.OutlineColor = Color.green; //set outline to green
     }
 
     private void DisableForSeconds(float seconds)
