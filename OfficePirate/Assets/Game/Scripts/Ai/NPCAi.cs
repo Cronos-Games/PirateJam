@@ -5,6 +5,7 @@ using UnityEngine;
 public class NPCAi : MonoBehaviour
 {
     AiMovementController _movementController;
+    AiSmoothMovementController _smoothMovementController;
 
     [SerializeField] private GameObject basePosition;
     [SerializeField] private GameObject[] targets;
@@ -23,10 +24,12 @@ public class NPCAi : MonoBehaviour
     void Start()
     {
         _movementController = GetComponent<AiMovementController>();
+        _smoothMovementController = GetComponent<AiSmoothMovementController>();
         
         CreatePath(true, false);
         _currentTarget = _path.First();
-        _movementController.SetDestination(_currentTarget.transform);
+        //_movementController.SetDestination(_currentTarget.transform);
+        _smoothMovementController.SetDestination(_currentTarget.transform);
     }
 
 
@@ -98,7 +101,7 @@ public class NPCAi : MonoBehaviour
             timeOut = Random.Range(baseLowerTimeLimit, baseUpperTimeLimit);
         }
 
-        StartTimer(timeOut);
+        StartTimer(timeOut); //TODO: interact with target
     }
 
  
@@ -112,7 +115,8 @@ public class NPCAi : MonoBehaviour
         }
 
         _currentTarget = _path.First();
-        _movementController.SetDestination(_currentTarget.transform);
+        //_movementController.SetDestination(_currentTarget.transform);
+        _smoothMovementController.SetDestination(_currentTarget.transform);
 
         if (_path.Count == 1)
         {
