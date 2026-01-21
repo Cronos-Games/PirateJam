@@ -34,6 +34,7 @@ public class ProcessController : MonoBehaviour, IInteractable
 
     private Coroutine disableRoutine;
     private Coroutine repairRoutine;
+    private Coroutine progressRoutine;
     private GameObject activeMiniGameInstance;
     private float tickAccumulator;
 
@@ -159,6 +160,13 @@ public class ProcessController : MonoBehaviour, IInteractable
 
     }
 
+    private IEnumerator ProgressRoutine(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        ProgressManager.Instance.AddProgress(progressPerInteract);
+        progressRoutine = null;
+    }
+
     public float AiInteract()
     {
         if (isDisabled)
@@ -169,10 +177,10 @@ public class ProcessController : MonoBehaviour, IInteractable
         }
         
         float interactTime = GetRandomTime(lowerInteractTime, upperInteractTime);
-        ProgressManager.Instance.AddProgress(progressPerInteract);
+        progressRoutine = StartCoroutine(ProgressRoutine(interactTime));
         return interactTime;
     }
-
+ 
     private float GetRandomTime(float lower, float upper)
     {
         return Random.Range(lower, upper);
