@@ -93,8 +93,9 @@ public class NPCAi : MonoBehaviour
         {
             ProcessController pc = _path.First().GetComponent<ProcessController>();
         
-            //timeout with random time within range for waypoint
-            timeOut = Random.Range(pc.LowerTimeLimit, pc.UpperTimeLimit);
+            
+            //interact with waypoint, either fixing it or adding progress and get time to wait before next checkpoint
+            timeOut = pc.AiInteract();
         }
         else
         {

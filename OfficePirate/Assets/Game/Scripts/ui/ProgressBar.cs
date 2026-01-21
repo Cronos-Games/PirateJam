@@ -41,11 +41,12 @@ public class ProgressBar : MonoBehaviour
         Apply(progress);
     }
 
-    public void SetProgress(float value01)
+    public void SetProgress(float value)
     {
-        progress = Mathf.Clamp01(value01);
+        progress = Mathf.Clamp01(value);
         Apply(progress);
     }
+
 
     private void Apply(float value01)
     {
