@@ -2,10 +2,11 @@ using System.Collections;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
+
 public class ProcessController : MonoBehaviour, IInteractable
 {
-    [Header("Progress")]
-    [SerializeField] [Required] private int progressPerSecond;
+    [Header("Progress")] 
+    //[SerializeField] [Required] private int progressPerSecond;
 
     [Header("Disable Minigame")]
     [SerializeField] [Required]  private MiniGameController miniGamePrefab;
@@ -15,31 +16,52 @@ public class ProcessController : MonoBehaviour, IInteractable
     [Tooltip("When multiple interactables are in range, higher priority wins.")]
     [SerializeField] private int priority = 0;
 
+    [Header("Ai")] 
+    [SerializeField] private int progressPerInteract;
+    public int upperRepairTime;
+    public int lowerRepairTime;
+    public int upperInteractTime;
+    public int lowerInteractTime;
+
+
+    [Header("Map")] 
+    [SerializeField] private GameObject mapShaderObject;
+    
+
     [Header("State (Read Only)")]
     [SerializeField] private bool isDisabled;
     [SerializeField] private float disabledTimeRemaining;
 
     private Coroutine disableRoutine;
+    private Coroutine repairRoutine;
+    private Coroutine progressRoutine;
     private GameObject activeMiniGameInstance;
     private float tickAccumulator;
+
+    private Outline _levelOutline;
+    private Outline _mapOutline;
 
     // --- IInteractable ---
     public Transform Transform => transform;
     public bool CanInteract => !isDisabled && activeMiniGameInstance == null && miniGamePrefab != null;
     public int Priority => priority;
-    
-    public float UpperTimeLimit;
-    public float LowerTimeLimit;
+
+
+    private void Start()
+    {
+        _levelOutline = GetComponent<Outline>();
+        _mapOutline = mapShaderObject.GetComponent<Outline>();
+    }
 
     private void Update()
     {
         if (isDisabled && disabledTimeRemaining > 0f)
             disabledTimeRemaining -= Time.deltaTime;
 
-        TickProgress();
+        //TickProgress();
     }
 
-    private void TickProgress()
+    /*private void TickProgress()
     {
         if (isDisabled || ProgressManager.Instance == null || progressPerSecond <= 0)
         {
@@ -54,7 +76,7 @@ public class ProcessController : MonoBehaviour, IInteractable
 
         tickAccumulator -= ticks;
         ProgressManager.Instance.AddProgress(progressPerSecond * ticks);
-    }
+    }*/
 
     public void Interact()
     {
@@ -83,7 +105,11 @@ public class ProcessController : MonoBehaviour, IInteractable
         Debug.Log("MiniGame Success");
         Destroy(activeMiniGameInstance);
         activeMiniGameInstance = null;
-        DisableForSeconds(disableDuration);
+        //DisableForSeconds(disableDuration);
+        
+        isDisabled = true;
+        _levelOutline.enabled = false;
+        _mapOutline.OutlineColor = Color.red; //set outline to red
     }
 
     private void OnMiniGameCancelled()
@@ -92,6 +118,15 @@ public class ProcessController : MonoBehaviour, IInteractable
         
         Destroy(activeMiniGameInstance);
         activeMiniGameInstance = null;
+        
+        _mapOutline.OutlineColor = Color.yellow; //set outline to yellow
+    }
+
+    private void OnTaskReset()
+    {
+        isDisabled = false;
+        _levelOutline.enabled = true;
+        _mapOutline.OutlineColor = Color.green; //set outline to green
     }
 
     private void DisableForSeconds(float seconds)
@@ -113,6 +148,42 @@ public class ProcessController : MonoBehaviour, IInteractable
         isDisabled = false;
         disabledTimeRemaining = 0f;
         disableRoutine = null;
+        
+        OnTaskReset();
+    }
+
+    private IEnumerator RepairRoutine(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        OnTaskReset();
+        repairRoutine = null;
+
+    }
+
+    private IEnumerator ProgressRoutine(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        ProgressManager.Instance.AddProgress(progressPerInteract);
+        progressRoutine = null;
+    }
+
+    public float AiInteract()
+    {
+        if (isDisabled)
+        {
+            float repairTime = GetRandomTime(lowerRepairTime, upperRepairTime);
+            repairRoutine =  StartCoroutine(RepairRoutine(repairTime));
+            return repairTime;
+        }
+        
+        float interactTime = GetRandomTime(lowerInteractTime, upperInteractTime);
+        progressRoutine = StartCoroutine(ProgressRoutine(interactTime));
+        return interactTime;
+    }
+ 
+    private float GetRandomTime(float lower, float upper)
+    {
+        return Random.Range(lower, upper);
     }
 
 #if UNITY_EDITOR

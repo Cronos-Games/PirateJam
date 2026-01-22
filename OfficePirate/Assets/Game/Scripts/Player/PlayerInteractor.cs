@@ -9,8 +9,10 @@ using UnityEngine.InputSystem;
 public class PlayerInteractor : MonoBehaviour
 {
     [Header("Input System")]
+    /*
     [Tooltip("Reference to an InputAction (Button) like 'Interact' bound to E.")]
     [SerializeField] private InputActionReference interactAction;
+    */
 
     [Header("Selection")]
     [Tooltip("Max number of candidates to consider (safety).")]
@@ -23,7 +25,7 @@ public class PlayerInteractor : MonoBehaviour
     private readonly HashSet<IInteractable> nearby = new();
     private IInteractable currentTarget;
 
-    private void OnEnable()
+    /*private void OnEnable()
     {
         if (interactAction != null)
         {
@@ -39,14 +41,14 @@ public class PlayerInteractor : MonoBehaviour
             interactAction.action.performed -= OnInteract;
             interactAction.action.Disable();
         }
-    }
+    }*/
 
     private void Update()
     {
         UpdateTarget();
     }
 
-    private void OnInteract(InputAction.CallbackContext _)
+    public void OnInteract(InputAction.CallbackContext context)
     {
         if (currentTarget == null) return;
         if (!currentTarget.CanInteract) return;

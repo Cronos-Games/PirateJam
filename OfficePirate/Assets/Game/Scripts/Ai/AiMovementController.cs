@@ -23,10 +23,7 @@ public class AiMovementController : MonoBehaviour
     [SerializeField] private float inputDeadzone = 0.15f;     // stick deadzone
     [SerializeField] private float rotationDeadzone = 2f;      // degrees
     [SerializeField] private float stoppingDistance = 1f;
-
-
-    [Header("References")]
-    [SerializeField] private GameObject target;
+    
 
     private bool _hasTargetYaw;
     private float _targetYaw; // degrees in world Y
@@ -62,8 +59,7 @@ public class AiMovementController : MonoBehaviour
         float distance = Vector3.Distance(_rb.position, _agent.destination);
         if (distance <= stoppingDistance && _isWalking)
         {
-            reachedWayPoint.Invoke();
-            Debug.Log("reached waypoint");
+            reachedWayPoint.Invoke(); //reached waypoint
             _isWalking = false;
         }
     }
