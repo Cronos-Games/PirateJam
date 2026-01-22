@@ -26,7 +26,7 @@ public class ProcessController : MonoBehaviour, IInteractable
 
 
     [Header("Map")] 
-    [SerializeField] private GameObject mapShaderObject;
+    //[SerializeField] private GameObject mapShaderObject;
     
     
     private bool isDisabled;
@@ -40,7 +40,7 @@ public class ProcessController : MonoBehaviour, IInteractable
     private float tickAccumulator;
 
     private Outline _levelOutline;
-    private Outline _mapOutline;
+    //private Outline _mapOutline;
 
     // --- IInteractable ---
     public Transform Transform => transform;
@@ -51,7 +51,7 @@ public class ProcessController : MonoBehaviour, IInteractable
     private void Start()
     {
         _levelOutline = GetComponent<Outline>();
-        _mapOutline = mapShaderObject.GetComponent<Outline>();
+        //_mapOutline = mapShaderObject.GetComponent<Outline>();
     }
 
     private void Update()
@@ -109,8 +109,7 @@ public class ProcessController : MonoBehaviour, IInteractable
         activeMiniGameInstance = null;
         
         isDisabled = true;
-        _levelOutline.enabled = false;
-        _mapOutline.OutlineColor = Color.red; //set outline to red
+        _levelOutline.OutlineColor = Color.red; //set outline to red
     }
 
     private void OnMiniGameCancelled()
@@ -120,7 +119,7 @@ public class ProcessController : MonoBehaviour, IInteractable
         Destroy(activeMiniGameInstance);
         activeMiniGameInstance = null;
         onCooldown = true;
-        _mapOutline.OutlineColor = Color.yellow; //set outline to yellow
+        _levelOutline.OutlineColor = Color.yellow; //set outline to yellow
     }
 
     private void OnMiniGameFailed()
@@ -129,15 +128,14 @@ public class ProcessController : MonoBehaviour, IInteractable
         Destroy(activeMiniGameInstance);
         activeMiniGameInstance = null;
         onCooldown = true;
-        _mapOutline.OutlineColor = Color.yellow; //set outline to yellow
+        _levelOutline.OutlineColor = Color.yellow; //set outline to yellow
     }
 
     private void OnTaskReset()
     {
         isDisabled = false;
         onCooldown = false;
-        _levelOutline.enabled = true;
-        _mapOutline.OutlineColor = Color.green; //set outline to green
+        _levelOutline.OutlineColor = Color.green; //set outline to green
     }
 
     /*
