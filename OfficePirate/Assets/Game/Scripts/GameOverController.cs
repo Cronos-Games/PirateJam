@@ -1,10 +1,9 @@
 using UnityEngine;
-using TMPro;
-using Unity.VisualScripting;
 
 public class GameOverUI : MonoBehaviour
 {
-    [SerializeField] private GameObject gameOverContainer; 
+    [SerializeField] private GameObject gameOverContainer;
+
     private void Awake()
     {
         if (gameOverContainer == null)
@@ -18,5 +17,6 @@ public class GameOverUI : MonoBehaviour
     public void ShowGameOver()
     {
         gameOverContainer.SetActive(true);
+        Time.timeScale = 0;
     }
 }

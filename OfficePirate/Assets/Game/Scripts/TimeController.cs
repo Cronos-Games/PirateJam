@@ -23,15 +23,20 @@ public class TimeController : MonoBehaviour
     private float _startTime = 0f;
     private bool _timerRunning = false;
     
-
-
-    private void Start()
+    public float CurrentTimeHours24
     {
-        onDayStart = new UnityEvent();
-        onDayEnd = new UnityEvent();
-        
-        StartTimer();
+        get
+        {
+            if (!_timerRunning) return dayStartHour;
+
+            float t = Time.timeSinceLevelLoad - _startTime;
+            float dayProgress01 = Mathf.Clamp01(t / dayDurationInSeconds);
+
+            float totalDayHours = dayEndHour - dayStartHour;
+            return dayStartHour + (dayProgress01 * totalDayHours);
+        }
     }
+
 
     private void Update()
     {
@@ -45,7 +50,7 @@ public class TimeController : MonoBehaviour
             if (Time.timeSinceLevelLoad - _startTime > dayDurationInSeconds)
             {
                 onDayEnd.Invoke();
-                StartTimer();
+                _timerRunning = false;
             }
             UpdateTimeText(Time.timeSinceLevelLoad - _startTime);
         }
