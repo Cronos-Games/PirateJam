@@ -21,7 +21,7 @@ public class MiniGameController : MonoBehaviour
     /// Called by the ProcessController right after spawning the minigame.
     /// We ADD callbacks instead of clearing anything.
     /// </summary>
-    public void Init(UnityAction successCallback, UnityAction cancelCallback = null)
+    public void Init(UnityAction successCallback, UnityAction failCallback, UnityAction cancelCallback)
     {
         if (successCallback != null)
             onSuccess.AddListener(successCallback);
@@ -29,6 +29,9 @@ public class MiniGameController : MonoBehaviour
         if (cancelCallback != null)
             onCancel.AddListener(cancelCallback);
 
+        if (failCallback != null)
+            onFail.AddListener(failCallback);
+        
         // Fire start event AFTER wiring is done
         onStart?.Invoke();
     }

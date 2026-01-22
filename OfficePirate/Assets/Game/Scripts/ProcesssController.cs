@@ -11,6 +11,7 @@ public class ProcessController : MonoBehaviour, IInteractable
     [Header("Disable Minigame")]
     [SerializeField] [Required]  private MiniGameController miniGamePrefab;
     [SerializeField] [Required]  private float disableDuration;
+    [SerializeField] [Required]  private float cooldownDuration;
 
     [Header("Interaction")]
     [Tooltip("When multiple interactables are in range, higher priority wins.")]
@@ -27,15 +28,15 @@ public class ProcessController : MonoBehaviour, IInteractable
     [Header("Map")] 
     [SerializeField] private GameObject mapShaderObject;
     
-
-    [Header("State (Read Only)")]
-    [SerializeField] private bool isDisabled;
-    [SerializeField] private float disabledTimeRemaining;
-
-    private Coroutine disableRoutine;
+    
+    private bool isDisabled;
+    private float disabledTimeRemaining;
+    private bool onCooldown;
+    
     private Coroutine repairRoutine;
     private Coroutine progressRoutine;
-    private GameObject activeMiniGameInstance;
+    private Coroutine cooldownRoutine;
+    private MiniGameController activeMiniGameInstance;
     private float tickAccumulator;
 
     private Outline _levelOutline;
@@ -43,7 +44,7 @@ public class ProcessController : MonoBehaviour, IInteractable
 
     // --- IInteractable ---
     public Transform Transform => transform;
-    public bool CanInteract => !isDisabled && activeMiniGameInstance == null && miniGamePrefab != null;
+    public bool CanInteract => !isDisabled && activeMiniGameInstance == null && miniGamePrefab != null && !onCooldown;
     public int Priority => priority;
 
 
@@ -82,10 +83,10 @@ public class ProcessController : MonoBehaviour, IInteractable
     {
         if (!CanInteract) return;
 
-        activeMiniGameInstance = Instantiate(miniGamePrefab.gameObject);
+        activeMiniGameInstance = Instantiate(miniGamePrefab);
 
-        var mini = activeMiniGameInstance.GetComponent<MiniGameController>();
-        reminding:
+        var mini = activeMiniGameInstance;
+
         if (mini == null)
         {
             Debug.LogError("MiniGame prefab must have MiniGameController on the root.");
@@ -96,6 +97,7 @@ public class ProcessController : MonoBehaviour, IInteractable
 
         mini.Init(
             successCallback: OnMiniGameSuccess,
+            failCallback: OnMiniGameFailed,
             cancelCallback: OnMiniGameCancelled
         );
     }
@@ -105,7 +107,6 @@ public class ProcessController : MonoBehaviour, IInteractable
         Debug.Log("MiniGame Success");
         Destroy(activeMiniGameInstance);
         activeMiniGameInstance = null;
-        //DisableForSeconds(disableDuration);
         
         isDisabled = true;
         _levelOutline.enabled = false;
@@ -118,17 +119,28 @@ public class ProcessController : MonoBehaviour, IInteractable
         
         Destroy(activeMiniGameInstance);
         activeMiniGameInstance = null;
-        
+        onCooldown = true;
+        _mapOutline.OutlineColor = Color.yellow; //set outline to yellow
+    }
+
+    private void OnMiniGameFailed()
+    {
+        Debug.Log("MiniGame failed");
+        Destroy(activeMiniGameInstance);
+        activeMiniGameInstance = null;
+        onCooldown = true;
         _mapOutline.OutlineColor = Color.yellow; //set outline to yellow
     }
 
     private void OnTaskReset()
     {
         isDisabled = false;
+        onCooldown = false;
         _levelOutline.enabled = true;
         _mapOutline.OutlineColor = Color.green; //set outline to green
     }
 
+    /*
     private void DisableForSeconds(float seconds)
     {
         if (disableRoutine != null)
@@ -136,8 +148,9 @@ public class ProcessController : MonoBehaviour, IInteractable
 
         disableRoutine = StartCoroutine(DisableRoutine(seconds));
     }
+    */
 
-    private IEnumerator DisableRoutine(float seconds)
+    /*private IEnumerator DisableRoutine(float seconds)
     {
         isDisabled = true;
         disabledTimeRemaining = seconds;
@@ -150,7 +163,7 @@ public class ProcessController : MonoBehaviour, IInteractable
         disableRoutine = null;
         
         OnTaskReset();
-    }
+    }*/
 
     private IEnumerator RepairRoutine(float seconds)
     {
@@ -167,6 +180,13 @@ public class ProcessController : MonoBehaviour, IInteractable
         progressRoutine = null;
     }
 
+    private IEnumerator CooldownRoutine(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        OnTaskReset();
+        repairRoutine = null;
+    }
+    
     public float AiInteract()
     {
         if (isDisabled)
@@ -177,6 +197,14 @@ public class ProcessController : MonoBehaviour, IInteractable
         }
         
         float interactTime = GetRandomTime(lowerInteractTime, upperInteractTime);
+        
+        if (activeMiniGameInstance != null)
+        {
+            activeMiniGameInstance.CompleteFail();
+            cooldownRoutine = StartCoroutine(CooldownRoutine(cooldownDuration + interactTime));
+        }
+        
+
         progressRoutine = StartCoroutine(ProgressRoutine(interactTime));
         return interactTime;
     }
