@@ -23,7 +23,6 @@ public class TimeController : MonoBehaviour
     private float _startTime = 0f;
     private bool _timerRunning = false;
     
-    
 
     private void Update()
     {
@@ -37,7 +36,7 @@ public class TimeController : MonoBehaviour
             if (Time.timeSinceLevelLoad - _startTime > dayDurationInSeconds)
             {
                 onDayEnd.Invoke();
-                
+                _timerRunning = false;
             }
             UpdateTimeText(Time.timeSinceLevelLoad - _startTime);
         }

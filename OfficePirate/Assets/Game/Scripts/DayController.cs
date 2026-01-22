@@ -29,6 +29,8 @@ public class DayController : MonoBehaviour
     private IEnumerator StartNewDay()
     {
         _day++;
+        onDayStarted.Invoke(_day);
+        yield return new WaitForFixedUpdate();
         dayText.text = $"Day {_day}";
         dayCutscene.SetActive(true);
         
@@ -36,7 +38,6 @@ public class DayController : MonoBehaviour
         
         dayCutscene.SetActive(false);
         
-        onDayStarted.Invoke(_day);
         timeController.StartTimer();
     }
 }
