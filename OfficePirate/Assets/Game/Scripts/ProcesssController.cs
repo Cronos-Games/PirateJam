@@ -31,7 +31,7 @@ public class ProcessController : MonoBehaviour, IInteractable
     
     private bool isDisabled;
     private float disabledTimeRemaining;
-    private bool onCooldown;
+    private bool available;
     
     private Coroutine repairRoutine;
     private Coroutine progressRoutine;
@@ -44,14 +44,14 @@ public class ProcessController : MonoBehaviour, IInteractable
 
     // --- IInteractable ---
     public Transform Transform => transform;
-    public bool CanInteract => !isDisabled && activeMiniGameInstance == null && miniGamePrefab != null && !onCooldown;
+    public bool CanInteract => !isDisabled && activeMiniGameInstance == null && miniGamePrefab != null && available;
     public int Priority => priority;
 
 
     private void Start()
     {
         _levelOutline = GetComponent<Outline>();
-        //_mapOutline = mapShaderObject.GetComponent<Outline>();
+        available = true;
     }
 
     private void Update()
@@ -118,7 +118,7 @@ public class ProcessController : MonoBehaviour, IInteractable
         
         Destroy(activeMiniGameInstance);
         activeMiniGameInstance = null;
-        onCooldown = true;
+        available = false;
         _levelOutline.OutlineColor = Color.yellow; //set outline to yellow
     }
 
@@ -127,14 +127,14 @@ public class ProcessController : MonoBehaviour, IInteractable
         Debug.Log("MiniGame failed");
         Destroy(activeMiniGameInstance);
         activeMiniGameInstance = null;
-        onCooldown = true;
+        available = false;
         _levelOutline.OutlineColor = Color.yellow; //set outline to yellow
     }
 
     private void OnTaskReset()
     {
         isDisabled = false;
-        onCooldown = false;
+        available = true;
         _levelOutline.OutlineColor = Color.green; //set outline to green
     }
 
@@ -175,6 +175,7 @@ public class ProcessController : MonoBehaviour, IInteractable
     {
         yield return new WaitForSeconds(seconds);
         ProgressManager.Instance.AddProgress(progressPerInteract);
+        available = true;
         progressRoutine = null;
     }
 
@@ -201,9 +202,10 @@ public class ProcessController : MonoBehaviour, IInteractable
             activeMiniGameInstance.CompleteFail();
             cooldownRoutine = StartCoroutine(CooldownRoutine(cooldownDuration + interactTime));
         }
+        available = false;
         
-
         progressRoutine = StartCoroutine(ProgressRoutine(interactTime));
+        
         return interactTime;
     }
  
