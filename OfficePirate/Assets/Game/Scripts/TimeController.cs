@@ -23,6 +23,20 @@ public class TimeController : MonoBehaviour
     private float _startTime = 0f;
     private bool _timerRunning = false;
     
+    public float CurrentTimeHours24
+    {
+        get
+        {
+            if (!_timerRunning) return dayStartHour;
+
+            float t = Time.timeSinceLevelLoad - _startTime;
+            float dayProgress01 = Mathf.Clamp01(t / dayDurationInSeconds);
+
+            float totalDayHours = dayEndHour - dayStartHour;
+            return dayStartHour + (dayProgress01 * totalDayHours);
+        }
+    }
+
 
     private void Update()
     {
