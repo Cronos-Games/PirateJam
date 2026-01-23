@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class NPCAi : MonoBehaviour
 {
-    AiMovementController _movementController;
     AiSmoothMovementController _smoothMovementController;
 
     [SerializeField] private GameObject basePosition;
-    [SerializeField] private GameObject[] targets;
     [SerializeField] private float baseUpperTimeLimit;
     [SerializeField] private float baseLowerTimeLimit;
+    [SerializeField] private int minTargets;
+    [SerializeField] private int maxTargets;
 
     
     private List<GameObject> _path = new List<GameObject>();
@@ -23,12 +23,11 @@ public class NPCAi : MonoBehaviour
 
     void Start()
     {
-        _movementController = GetComponent<AiMovementController>();
         _smoothMovementController = GetComponent<AiSmoothMovementController>();
         
-        CreatePath(true, false);
+        GetPath(minTargets, maxTargets);
+        
         _currentTarget = _path.First();
-        //_movementController.SetDestination(_currentTarget.transform);
         _smoothMovementController.SetDestination(_currentTarget.transform);
     }
 
@@ -56,49 +55,34 @@ public class NPCAi : MonoBehaviour
     }
     
 
-    //create path to check
-    private void CreatePath(bool allTargets, bool reverse = false)
+
+    private void GetPath(int minimumTargets, int maximumTargets)
     {
         _path.Clear();
-        if (allTargets)
+        
+        int amountOfTargets =  Random.Range(minimumTargets, maximumTargets + 1);
+        List<GameObject> targets = AiManager.Instance.GetRandomTargets(amountOfTargets);
+        
+        foreach (GameObject target in targets)
         {
-            if (!reverse)
-            {
-                for (int i = 0; i < targets.Length; i++)
-                {
-                    _path.Add(targets[i]);
-                }
-            }
-            else
-            {
-                for (int i = targets.Length; i > 0; i--)
-                {
-                    _path.Add(targets[i - 1]);
-                }
-            }
-
+            _path.Add(target);
         }
-        else
-        {
-            GameObject randomTarget =  targets[Random.Range(0, targets.Length)];
-            _path.Add(randomTarget);
-        }
+        
         _path.Add(basePosition);
     }
-
+    
     public void OnReachedWaypoint()
     {
         float timeOut = 0;
         if (_path.Count > 1)
         {
-            ProcessController pc = _path.First().GetComponent<ProcessController>();
-        
+            ProcessController pc = _currentTarget.GetComponent<ProcessController>();
             
             //interact with waypoint, either fixing it or adding progress and get time to wait before next checkpoint
             timeOut = pc.AiInteract();
         }
         else
-        {
+        {   
             timeOut = Random.Range(baseLowerTimeLimit, baseUpperTimeLimit);
         }
 
@@ -109,19 +93,22 @@ public class NPCAi : MonoBehaviour
     
     private void TimerEnded()
     {
-        if (_path.Count > 1)
+        if (_path.Count == 0)
         {
-            _path.Remove(_currentTarget);
-
+            GetPath(minTargets, maxTargets);
         }
+        
+        _currentTarget = _path[0];
+        
+        if (_currentTarget != basePosition && !AiManager.Instance.availableTargets.Contains(_currentTarget))
+            AiManager.Instance.availableTargets.Add(_currentTarget);
+        
+        _path.RemoveAt(0);
 
-        _currentTarget = _path.First();
-        //_movementController.SetDestination(_currentTarget.transform);
+        if (_path.Count == 0)
+            GetPath(minTargets, maxTargets);
+
+        _currentTarget = _path[0];
         _smoothMovementController.SetDestination(_currentTarget.transform);
-
-        if (_path.Count == 1)
-        {
-            CreatePath(true, false);
-        }
     }
 }
