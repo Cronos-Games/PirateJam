@@ -55,36 +55,6 @@ public class NPCAi : MonoBehaviour
     }
     
 
-    /*//create path to check
-    private void CreatePath(bool allTargets, bool reverse = false)
-    {
-        _path.Clear();
-        if (allTargets)
-        {
-            if (!reverse)
-            {
-                for (int i = 0; i < targets.Length; i++)
-                {
-                    _path.Add(targets[i]);
-                }
-            }
-            else
-            {
-                for (int i = targets.Length; i > 0; i--)
-                {
-                    _path.Add(targets[i - 1]);
-                }
-            }
-
-        }
-        else
-        {
-            GameObject randomTarget =  targets[Random.Range(0, targets.Length)];
-            _path.Add(randomTarget);
-        }
-        _path.Add(basePosition);
-    }*/
-
 
     private void GetPath(int minimumTargets, int maximumTargets)
     {
@@ -101,7 +71,6 @@ public class NPCAi : MonoBehaviour
         _path.Add(basePosition);
     }
     
-
     public void OnReachedWaypoint()
     {
         float timeOut = 0;

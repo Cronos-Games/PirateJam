@@ -186,16 +186,16 @@ public class ProcessController : MonoBehaviour, IInteractable
         repairRoutine = null;
     }
     
-    public float AiInteract()
+    public float AiInteract(float timeMultiplier = 1)
     {
         if (isDisabled)
         {
-            float repairTime = GetRandomTime(lowerRepairTime, upperRepairTime);
+            float repairTime = GetRandomTime(lowerRepairTime, upperRepairTime) * timeMultiplier;
             repairRoutine =  StartCoroutine(RepairRoutine(repairTime));
             return repairTime;
         }
         
-        float interactTime = GetRandomTime(lowerInteractTime, upperInteractTime);
+        float interactTime = GetRandomTime(lowerInteractTime, upperInteractTime) * timeMultiplier;
         
         if (activeMiniGameInstance != null)
         {

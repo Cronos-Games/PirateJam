@@ -45,4 +45,14 @@ public class AiManager : MonoBehaviour
             
         return returnList;
     }
+
+    public List<GameObject> GetAllInteractables()
+    {
+        List<GameObject> returnList = new List<GameObject>();
+        foreach (GameObject interactable in Interactables)
+        {
+            returnList.Add(interactable);
+        }
+        return returnList;
+    }
 }
