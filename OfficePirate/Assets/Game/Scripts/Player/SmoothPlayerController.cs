@@ -8,7 +8,8 @@ public class SmoothPlayerController : MonoBehaviour
 
     // Input (world-based): x = world X, y = world Z
     private Vector2 _moveInput;
-
+    private bool isRunning;
+    
     // Root motion accumulation between physics ticks
     private Vector3 _deltaPos;
 
@@ -32,6 +33,14 @@ public class SmoothPlayerController : MonoBehaviour
     public void GetMoveInput(InputAction.CallbackContext context)
     { 
             _moveInput = context.ReadValue<Vector2>();
+    }
+
+    public void GetRunInput(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            isRunning = true;
+        if (context.canceled)
+            isRunning = false;
     }
 
     private Vector2 GetCleanMoveInput()
@@ -79,6 +88,7 @@ public class SmoothPlayerController : MonoBehaviour
     {
         bool moving = _moveInput.sqrMagnitude >= inputDeadzone * inputDeadzone;
         _animator.SetBool("IsMoving", moving);
+        _animator.SetBool("IsRunning", isRunning);
     }
 
     private void RotateCharacter(Vector2 cleanInput)
