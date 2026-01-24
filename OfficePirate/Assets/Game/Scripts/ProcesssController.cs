@@ -1,11 +1,14 @@
+using System;
 using System.Collections;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Events;
+using Random = UnityEngine.Random;
 
 
 public class ProcessController : MonoBehaviour, IInteractable
 {
-    [Header("Progress")] 
+    // [Header("Progress")] 
     //[SerializeField] [Required] private int progressPerSecond;
 
     [Header("Disable Minigame")]
@@ -16,6 +19,8 @@ public class ProcessController : MonoBehaviour, IInteractable
     [Header("Interaction")]
     [Tooltip("When multiple interactables are in range, higher priority wins.")]
     [SerializeField] private int priority = 0;
+    [SerializeField] private Camera mainCamera;
+    [SerializeField] private MapController mapcontroller;
 
     [Header("Ai")] 
     [SerializeField] private int progressPerInteract;
@@ -23,9 +28,11 @@ public class ProcessController : MonoBehaviour, IInteractable
     public int lowerRepairTime;
     public int upperInteractTime;
     public int lowerInteractTime;
+    
+    
 
 
-    [Header("Map")] 
+    // [Header("Map")] 
     //[SerializeField] private GameObject mapShaderObject;
     
     
@@ -36,7 +43,6 @@ public class ProcessController : MonoBehaviour, IInteractable
     private Coroutine repairRoutine;
     private Coroutine progressRoutine;
     private Coroutine cooldownRoutine;
-    private MiniGameController activeMiniGameInstance;
     private float tickAccumulator;
 
     private Outline _levelOutline;
@@ -44,7 +50,8 @@ public class ProcessController : MonoBehaviour, IInteractable
 
     // --- IInteractable ---
     public Transform Transform => transform;
-    public bool CanInteract => !isDisabled && activeMiniGameInstance == null && miniGamePrefab != null && available;
+    public bool CanInteract => !isDisabled && !miniGamePrefab.gameObject.activeInHierarchy && miniGamePrefab != null && available;
+
     public int Priority => priority;
 
 
@@ -59,55 +66,47 @@ public class ProcessController : MonoBehaviour, IInteractable
         if (isDisabled && disabledTimeRemaining > 0f)
             disabledTimeRemaining -= Time.deltaTime;
 
-        //TickProgress();
     }
-
-    /*private void TickProgress()
-    {
-        if (isDisabled || ProgressManager.Instance == null || progressPerSecond <= 0)
-        {
-            tickAccumulator = 0f;
-            return;
-        }
-
-        tickAccumulator += Time.deltaTime;
-
-        int ticks = (int)tickAccumulator;
-        if (ticks <= 0) return;
-
-        tickAccumulator -= ticks;
-        ProgressManager.Instance.AddProgress(progressPerSecond * ticks);
-    }*/
-
     public void Interact()
     {
-        if (!CanInteract) return;
 
-        activeMiniGameInstance = Instantiate(miniGamePrefab);
+        StartMiniGame();
+    }
 
-        var mini = activeMiniGameInstance;
-
-        if (mini == null)
-        {
-            Debug.LogError("MiniGame prefab must have MiniGameController on the root.");
-            Destroy(activeMiniGameInstance);
-            activeMiniGameInstance = null;
-            return;
-        }
-
-        mini.Init(
+    private void StartMiniGame()
+    {
+        miniGamePrefab.gameObject.SetActive(true);
+        mainCamera.enabled = false;
+        mapcontroller.Enabled = false;
+        
+        miniGamePrefab.Subscribe(
             successCallback: OnMiniGameSuccess,
             failCallback: OnMiniGameFailed,
             cancelCallback: OnMiniGameCancelled
         );
+
+        Debug.Log(miniGamePrefab);
+    }
+
+    private void StopMiniGame()
+    {
+        Debug.Log("MiniGame Stop");
+        mainCamera.enabled = true;
+        mapcontroller.Enabled = true;
+
+        miniGamePrefab.UnSubscribe(
+            successCallback: OnMiniGameSuccess,
+            failCallback: OnMiniGameFailed,
+            cancelCallback: OnMiniGameCancelled
+        );
+        miniGamePrefab.gameObject.SetActive(false);
+        
     }
 
     private void OnMiniGameSuccess()
     {
         Debug.Log("MiniGame Success");
-        Destroy(activeMiniGameInstance);
-        activeMiniGameInstance = null;
-        
+        StopMiniGame();
         isDisabled = true;
         _levelOutline.OutlineColor = Color.red; //set outline to red
     }
@@ -116,8 +115,7 @@ public class ProcessController : MonoBehaviour, IInteractable
     {
         Debug.Log("MiniGame cancelled");
         
-        Destroy(activeMiniGameInstance);
-        activeMiniGameInstance = null;
+        StopMiniGame();
         available = false;
         _levelOutline.OutlineColor = Color.yellow; //set outline to yellow
     }
@@ -125,8 +123,7 @@ public class ProcessController : MonoBehaviour, IInteractable
     private void OnMiniGameFailed()
     {
         Debug.Log("MiniGame failed");
-        Destroy(activeMiniGameInstance);
-        activeMiniGameInstance = null;
+        StopMiniGame();
         available = false;
         _levelOutline.OutlineColor = Color.yellow; //set outline to yellow
     }
@@ -197,9 +194,9 @@ public class ProcessController : MonoBehaviour, IInteractable
         
         float interactTime = GetRandomTime(lowerInteractTime, upperInteractTime) * timeMultiplier;
         
-        if (activeMiniGameInstance != null)
+        if (miniGamePrefab.enabled)
         {
-            activeMiniGameInstance.CompleteFail();
+            miniGamePrefab.CompleteFail();
             cooldownRoutine = StartCoroutine(CooldownRoutine(cooldownDuration + interactTime));
         }
         available = false;
