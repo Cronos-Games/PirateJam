@@ -8,7 +8,7 @@ public class SmoothPlayerController : MonoBehaviour
 
     // Input (world-based): x = world X, y = world Z
     private Vector2 _moveInput;
-    private bool isRunning;
+    public bool isRunning;
     
     // Root motion accumulation between physics ticks
     private Vector3 _deltaPos;

@@ -12,8 +12,6 @@ public class AiManager : MonoBehaviour
     public static AiManager Instance;
     public List<GameObject> availableTargets;
     
-    
-    
 
     private void Awake()
     {
