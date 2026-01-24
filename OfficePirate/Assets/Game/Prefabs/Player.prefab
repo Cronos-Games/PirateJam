@@ -1390,7 +1390,7 @@ GameObject:
   - component: {fileID: 9220577858148908579}
   - component: {fileID: 9133051047239753258}
   - component: {fileID: 7292378986292690359}
-  - component: {fileID: 3432446290919856453}
+  - component: {fileID: 6089199421595690308}
   - component: {fileID: 7661573045565093464}
   - component: {fileID: 5250746119767713075}
   - component: {fileID: 6139347497254699792}
@@ -1473,7 +1473,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &3432446290919856453
+--- !u!114 &6089199421595690308
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1487,6 +1487,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MapController
   mapCamera: {fileID: 0}
   playerMoveAction: {fileID: 0}
+  Enabled: 1
 --- !u!114 &7661573045565093464
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1530,7 +1531,7 @@ MonoBehaviour:
     m_ActionName: 'Player/Move[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d,/Keyboard/upArrow,/Keyboard/downArrow,/Keyboard/leftArrow,/Keyboard/rightArrow]'
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 3432446290919856453}
+      - m_Target: {fileID: 6089199421595690308}
         m_TargetAssemblyTypeName: MapController, Assembly-CSharp
         m_MethodName: ToggleMap
         m_Mode: 0
