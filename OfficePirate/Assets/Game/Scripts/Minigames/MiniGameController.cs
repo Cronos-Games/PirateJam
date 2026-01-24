@@ -1,3 +1,5 @@
+using System;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -17,11 +19,16 @@ public class MiniGameController : MonoBehaviour
     [Tooltip("Fired when the player exits/cancels the minigame voluntarily.")]
     public UnityEvent onCancel;
 
+    private void OnEnable()
+    {
+        onStart.Invoke();
+    }
+
     /// <summary>
     /// Called by the ProcessController right after spawning the minigame.
     /// We ADD callbacks instead of clearing anything.
     /// </summary>
-    public void Init(UnityAction successCallback, UnityAction failCallback, UnityAction cancelCallback)
+    public void Subscribe(UnityAction successCallback, UnityAction failCallback, UnityAction cancelCallback)
     {
         if (successCallback != null)
             onSuccess.AddListener(successCallback);
@@ -32,25 +39,33 @@ public class MiniGameController : MonoBehaviour
         if (failCallback != null)
             onFail.AddListener(failCallback);
         
-        // Fire start event AFTER wiring is done
-        onStart?.Invoke();
+    }
+    
+    public void UnSubscribe(UnityAction successCallback, UnityAction failCallback, UnityAction cancelCallback)
+    {
+        if (successCallback != null)
+            onSuccess.RemoveListener(successCallback);
+
+        if (cancelCallback != null)
+            onCancel.RemoveListener(cancelCallback);
+
+        if (failCallback != null)
+            onFail.RemoveListener(failCallback);
+        
     }
 
     public void CompleteSuccess()
     {
         onSuccess?.Invoke();
-        Destroy(gameObject);
     }
 
     public void CompleteFail()
     {
         onFail?.Invoke();
-        Destroy(gameObject);
     }
 
     public void CompleteCancel()
     {
         onCancel?.Invoke();
-        Destroy(gameObject);
     }
 }
