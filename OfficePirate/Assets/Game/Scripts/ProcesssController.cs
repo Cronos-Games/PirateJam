@@ -19,8 +19,8 @@ public class ProcessController : MonoBehaviour, IInteractable
     [Header("Interaction")]
     [Tooltip("When multiple interactables are in range, higher priority wins.")]
     [SerializeField] private int priority = 0;
-    [SerializeField] private Camera mainCamera;
-    [SerializeField] private MapController mapcontroller;
+    private Camera mainCamera;
+    private MapController mapController;
 
     [Header("Ai")] 
     [SerializeField] private int progressPerInteract;
@@ -59,6 +59,9 @@ public class ProcessController : MonoBehaviour, IInteractable
     {
         _levelOutline = GetComponent<Outline>();
         available = true;
+
+        mainCamera = Camera.main;
+        mapController = GameObject.FindGameObjectWithTag("Player").GetComponent<MapController>();
     }
 
     private void Update()
@@ -77,7 +80,7 @@ public class ProcessController : MonoBehaviour, IInteractable
     {
         miniGamePrefab.gameObject.SetActive(true);
         mainCamera.enabled = false;
-        mapcontroller.Enabled = false;
+        mapController.Enabled = false;
         
         miniGamePrefab.Subscribe(
             successCallback: OnMiniGameSuccess,
@@ -92,7 +95,7 @@ public class ProcessController : MonoBehaviour, IInteractable
     {
         Debug.Log("MiniGame Stop");
         mainCamera.enabled = true;
-        mapcontroller.Enabled = true;
+        mapController.Enabled = true;
 
         miniGamePrefab.UnSubscribe(
             successCallback: OnMiniGameSuccess,
