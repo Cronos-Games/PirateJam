@@ -43,7 +43,7 @@ public class AiManager : MonoBehaviour
         
         for (int i = 0; i < amount; i++)
         {
-            randomIndex = Random.Range(0, availableTargets.Count + 1);
+            randomIndex = Random.Range(0, availableTargets.Count);
             returnList.Add(availableTargets[randomIndex]);
             availableTargets.Remove(availableTargets[randomIndex]);
         }
