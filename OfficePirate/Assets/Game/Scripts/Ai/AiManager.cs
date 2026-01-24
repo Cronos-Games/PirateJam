@@ -7,9 +7,12 @@ public class AiManager : MonoBehaviour
     [Header("References")]
     [SerializeField] private GameObject[] Interactables;
     
+    public ManagerAi managerAi;
     
     public static AiManager Instance;
     public List<GameObject> availableTargets;
+    
+    
     
 
     private void Awake()
@@ -28,6 +31,8 @@ public class AiManager : MonoBehaviour
         {
             availableTargets.Add(target);
         }
+        
+        managerAi = GameObject.FindGameObjectWithTag("Manager").GetComponent<ManagerAi>();
     }
 
 

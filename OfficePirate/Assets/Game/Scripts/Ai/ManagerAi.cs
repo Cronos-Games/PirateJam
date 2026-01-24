@@ -16,12 +16,11 @@ public class ManagerAi : MonoBehaviour
     private float _startTime;
     private float _endTime;
     private bool _timerRunning = false;
+    private bool _isWalking = false;
     
     void Start()
     {
         _smoothMovementController = GetComponent<AiSmoothMovementController>();
-        
-        CallManager();
     }
     
     void Update()
@@ -70,6 +69,10 @@ public class ManagerAi : MonoBehaviour
             timeOut = pc.AiInteract(interactionMultiplier);
             StartTimer(timeOut);
         }
+        else
+        {
+            _isWalking = false;
+        }
     }
 
     private void TimerEnded()
@@ -84,10 +87,15 @@ public class ManagerAi : MonoBehaviour
 
     public void CallManager()
     {
-        GetPath();
-        
-        _currentTarget = _path.First();
-        _smoothMovementController.SetDestination(_currentTarget.transform);
+        if(!_isWalking)
+        {
+            GetPath();
+
+            _currentTarget = _path.First();
+            _smoothMovementController.SetDestination(_currentTarget.transform);
+
+            _isWalking = true;
+        }
     }
     
 }
