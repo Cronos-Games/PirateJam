@@ -30,7 +30,12 @@ public class FrontDeskMinigameController : MiniGameController
         foreach (var btn in taskButtons)
         {
             if (btn != null)
+            {
                 _remainingButtons.Add(btn);
+                btn.gameObject.SetActive(true);
+                Debug.Log("Resetting state");
+            }
+
         }
     }
 
@@ -61,7 +66,8 @@ public class FrontDeskMinigameController : MiniGameController
         }
 
         _remainingButtons.Remove(_pendingButton);
-        Destroy(_pendingButton.gameObject);
+        
+        _pendingButton.gameObject.SetActive(false);
 
         _pendingButton = null;
         confirmDialogPanel.SetActive(false);

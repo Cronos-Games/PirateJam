@@ -103,7 +103,6 @@ public class ProcessController : MonoBehaviour, IInteractable
             cancelCallback: OnMiniGameCancelled
         );
         miniGamePrefab.gameObject.SetActive(false);
-        
     }
 
     private void OnMiniGameSuccess()
