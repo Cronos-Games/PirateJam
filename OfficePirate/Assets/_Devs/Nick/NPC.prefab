@@ -4019,13 +4019,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCAi
   basePosition: {fileID: 0}
-  targets:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
   baseUpperTimeLimit: 20
   baseLowerTimeLimit: 10
+  minTargets: 0
+  maxTargets: 0
 --- !u!114 &6246254646157407815
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4056,7 +4053,6 @@ MonoBehaviour:
   inputDeadzone: 0.15
   rotationDeadzone: 2
   stoppingDistance: 1
-  target: {fileID: 0}
 --- !u!95 &7952261995016620559
 Animator:
   serializedVersion: 7
